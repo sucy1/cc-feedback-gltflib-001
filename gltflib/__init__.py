@@ -6,6 +6,7 @@ from .enums import *
 from .models import *
 from .utils import *
 from .gltf import GLTF
+from .validation import ValidationIssue, ValidationReport, GLTFValidationError, validate_model
 from .gltf_resource import (
     GLTFResource,
     FileResource,

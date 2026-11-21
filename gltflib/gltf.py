@@ -10,6 +10,7 @@ from .gltf_resource import (
     GLB_BINARY_CHUNK_TYPE)
 from .models import GLTFModel, Buffer, BufferView, Image
 from .utils import padbytes, create_parent_dirs
+from .validation import ValidationReport, GLTFValidationError, validate_model
 
 
 class GLTF:
@@ -142,6 +143,20 @@ class GLTF:
         gltf._load_resources(basepath, load_file_resources)
         return gltf
 
+
+    def validate(self, strict: bool = False) -> ValidationReport:
+        """
+        Validates the structure of the model and returns a ValidationReport. The checks are purely structural
+        (accessor/bufferView bounds and alignment, sparse accessor capacity, animation sampler counts, skin and
+        primitive attribute consistency) and do not require buffer binary data to be loaded.
+        :param strict: If True, raises a GLTFValidationError (carrying the report on its "report" attribute) when
+            any issues are found. If False (the default), the report is returned without raising.
+        :return: ValidationReport
+        """
+        report = validate_model(self.model)
+        if strict and not report.ok:
+            raise GLTFValidationError(report)
+        return report
 
     @property
     def glb_resources(self):
